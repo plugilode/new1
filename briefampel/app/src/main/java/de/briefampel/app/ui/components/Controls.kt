@@ -154,7 +154,7 @@ fun Chip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifie
 @Composable
 fun Disclaimer(modifier: Modifier = Modifier) {
     Text(
-        "Sortiert und entwirft. Ersetzt keine Rechtsberatung – Fristen selbst gegenprüfen.",
+        "Ich sortiere und helfe beim Schreiben. Eine Rechtsberatung ersetze ich nicht – Fristen bitte selbst gegenprüfen.",
         style = BriefType.fine,
         color = Brief.colors.textFaint,
         modifier = modifier,
@@ -162,6 +162,12 @@ fun Disclaimer(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonoLabel(text: String, modifier: Modifier = Modifier, color: Color = Brief.colors.textFaint) {
-    Text(text, style = BriefType.label, color = color, modifier = modifier)
+fun Eyebrow(text: String, modifier: Modifier = Modifier, color: Color = Brief.colors.textFaint) {
+    Text(text.uppercase(), style = BriefType.label, color = color, modifier = modifier)
+}
+
+/** Die persönliche Stimme der App – kursiv, wie eine Notiz von jemandem, der sich kümmert. */
+@Composable
+fun Voice(text: String, modifier: Modifier = Modifier, color: Color = Brief.colors.textSoft) {
+    Text(text, style = BriefType.voice, color = color, modifier = modifier)
 }

@@ -42,11 +42,12 @@ import de.briefampel.app.ui.components.DeadlineCard
 import de.briefampel.app.ui.components.Disclaimer
 import de.briefampel.app.ui.components.FactList
 import de.briefampel.app.ui.components.LightState
-import de.briefampel.app.ui.components.MonoLabel
+import de.briefampel.app.ui.components.Eyebrow
 import de.briefampel.app.ui.components.PrimaryButton
 import de.briefampel.app.ui.components.SealedEnvelope
 import de.briefampel.app.ui.components.TextLink
 import de.briefampel.app.ui.components.TrafficLight
+import de.briefampel.app.ui.components.Voice
 import de.briefampel.app.ui.theme.Brief
 import de.briefampel.app.ui.theme.BriefType
 import de.briefampel.app.ui.theme.Ink
@@ -77,7 +78,7 @@ fun ResultScreen(state: UiState, onBack: () -> Unit, onReply: () -> Unit, onTogg
             Modifier.fillMaxSize().drawBehind {
                 drawRect(
                     Brush.radialGradient(
-                        0f to glow.copy(alpha = 0.30f), 0.5f to glow.copy(alpha = 0.09f), 1f to Color.Transparent,
+                        0f to glow.copy(alpha = if (c.isDark) 0.24f else 0.20f), 0.5f to glow.copy(alpha = 0.06f), 1f to Color.Transparent,
                         center = Offset(62.dp.toPx(), 150.dp.toPx() + 98.dp.toPx() * a.ampel.ordinal * 0.66f - scroll.value),
                         radius = size.width * 1.1f,
                     ),
@@ -94,7 +95,7 @@ fun ResultScreen(state: UiState, onBack: () -> Unit, onReply: () -> Unit, onTogg
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 CircleIconButton(BriefIcons.Back, "Zurück", onBack)
-                MonoLabel("GEPRÜFT ${state.checkedAt?.let(checkedFormat::format).orEmpty()}")
+                Eyebrow("Gelesen ${state.checkedAt?.let(checkedFormat::format).orEmpty()}")
                 CircleIconButton(BriefIcons.Share, "Ergebnis teilen", {
                     val text = buildString {
                         appendLine("Briefampel: ${a.ampel.label} – ${a.title}")
@@ -106,11 +107,11 @@ fun ResultScreen(state: UiState, onBack: () -> Unit, onReply: () -> Unit, onTogg
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(22.dp), verticalAlignment = Alignment.Top) {
-                TrafficLight(LightState.Lit(a.ampel, animate = false), lampSize = 52.dp, gap = 14.dp, padding = 16.dp)
+                TrafficLight(LightState.Lit(a.ampel, animate = false), lampSize = 48.dp, gap = 12.dp, padding = 14.dp)
                 Column(Modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    MonoLabel(a.ampel.tag, color = c.lamp(a.ampel))
+                    Eyebrow(a.ampel.tag, color = c.lamp(a.ampel))
                     Text(a.ampel.headline, style = BriefType.heroLarge, color = c.lamp(a.ampel), modifier = Modifier.semantics { heading() })
-                    Text(a.ampel.promise, style = BriefType.bodySmall, color = c.textMuted)
+                    Voice(a.ampel.promise)
                 }
             }
 
@@ -155,10 +156,10 @@ fun ResultScreen(state: UiState, onBack: () -> Unit, onReply: () -> Unit, onTogg
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (a.replyNeeded || a.ampel != Ampel.GRUEN) {
-                PrimaryButton("Antwort schreiben", onReply, icon = BriefIcons.Pen)
+                PrimaryButton("Ich schreib dir die Antwort", onReply, icon = BriefIcons.Pen)
             } else {
                 PrimaryButton(if (state.envelopeOpen) "Brief zuklappen" else "Brief jetzt lesen", onToggleEnvelope)
-                TextLink("Antwort nicht nötig – trotzdem eine?", onReply, Modifier.fillMaxWidth().height(36.dp))
+                TextLink("Du musst nicht antworten – trotzdem eine?", onReply, Modifier.fillMaxWidth().height(36.dp))
             }
             Disclaimer()
         }

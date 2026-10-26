@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -53,6 +54,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import de.briefampel.app.domain.Ampel
@@ -64,18 +66,21 @@ import de.briefampel.app.ui.components.CircleIconButton
 import de.briefampel.app.ui.components.DeadlineRing
 import de.briefampel.app.ui.components.Disclaimer
 import de.briefampel.app.ui.components.LightState
-import de.briefampel.app.ui.components.MonoLabel
+import de.briefampel.app.ui.components.Eyebrow
 import de.briefampel.app.ui.components.OutlineButton
 import de.briefampel.app.ui.components.PageStack
 import de.briefampel.app.ui.components.PrimaryButton
 import de.briefampel.app.ui.components.TextLink
 import de.briefampel.app.ui.components.TrafficLight
+import de.briefampel.app.ui.components.Voice
 import de.briefampel.app.ui.components.pagesLabel
 import de.briefampel.app.ui.theme.Brief
 import de.briefampel.app.ui.theme.BriefType
 import de.briefampel.app.ui.theme.Lamp
 import de.briefampel.app.ui.theme.Motion
+import de.briefampel.app.ui.theme.Serif
 import kotlinx.coroutines.delay
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 private val dayMonth = DateTimeFormatter.ofPattern("dd.MM.")
@@ -107,6 +112,7 @@ fun HomeScreen(
 
     var lightTop by remember { mutableStateOf(Offset.Zero) }
     Box(Modifier.fillMaxSize().background(c.background)) {
+        AmbientLight(lightTop)
         if (result) ColorWash(analysis!!.ampel, lightTop)
         Pole(lightTop)
 
@@ -120,7 +126,10 @@ fun HomeScreen(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     AmpelMark()
-                    Text("Briefampel", style = BriefType.brand, color = c.text, modifier = Modifier.semantics { heading() })
+                    Column {
+                        Text("Briefampel", style = BriefType.brand, color = c.text, modifier = Modifier.semantics { heading() })
+                        Text(greeting(state.sender.name), style = BriefType.fine.copy(fontStyle = FontStyle.Italic, fontFamily = Serif, fontSize = BriefType.fine.fontSize * 1.1f), color = c.textMuted)
+                    }
                 }
                 CircleIconButton(BriefIcons.Person, "Absender und Einstellungen", onOpenSender)
             }
@@ -165,12 +174,43 @@ fun HomeScreen(
     }
 }
 
+private fun greeting(name: String): String {
+    val hour = LocalDateTime.now().hour
+    val hello = when (hour) {
+        in 5..10 -> "Guten Morgen"
+        in 11..17 -> "Schön, dass du da bist"
+        else -> "Guten Abend"
+    }
+    val first = name.trim().substringBefore(' ')
+    return if (first.isNotEmpty()) "$hello, $first." else "$hello."
+}
+
+/** Warmes Licht, das immer im Raum liegt – als stünde eine Lampe neben dir. */
+@Composable
+private fun AmbientLight(lightTop: Offset) {
+    val c = Brief.colors
+    Box(
+        Modifier.fillMaxSize().drawBehind {
+            val center = if (lightTop == Offset.Zero) Offset(size.width * 0.2f, size.height * 0.25f) else Offset(lightTop.x, lightTop.y + 140.dp.toPx())
+            drawRect(
+                Brush.radialGradient(
+                    0f to c.ambient.copy(alpha = if (c.isDark) 0.16f else 0.22f),
+                    0.55f to c.ambient.copy(alpha = if (c.isDark) 0.05f else 0.07f),
+                    1f to Color.Transparent,
+                    center = center,
+                    radius = size.maxDimension * 0.75f,
+                ),
+            )
+        },
+    )
+}
+
 /** Der Mast unter dem Gehäuse, der nach unten ins Dunkel ausläuft. */
 @Composable
 private fun Pole(lightTop: Offset) {
     if (lightTop == Offset.Zero) return
     val density = LocalDensity.current
-    val pole = if (Brief.colors.isDark) Color(0xFF1C1F23) else Color(0xFFD9DCE1)
+    val pole = Brief.colors.housingBottom
     Box(
         Modifier.fillMaxSize().drawBehind {
             val w = with(density) { 14.dp.toPx() }
@@ -226,9 +266,9 @@ private fun Headline(state: UiState, modifier: Modifier = Modifier) {
     val result = state.phase == Phase.RESULT && analysis != null
     val (head, sub) = when {
         result -> analysis!!.ampel.headline to analysis.ampel.tag
-        state.phase == Phase.CHECKING -> "Moment.\nIch lese\nfür dich." to "Dauert ein paar Sekunden."
-        state.phase == Phase.PAGES -> pagesHeadline(state.input.pageCount) to "Ich schaue rein, du musst es nicht."
-        else -> "Gib her.\nIch lese\nzuerst." to "Du siehst nur die Ampel – und was zu tun ist."
+        state.phase == Phase.CHECKING -> "Einen\nMoment …" to "Ich lese ganz in Ruhe. Du musst nichts tun."
+        state.phase == Phase.PAGES -> "Danke.\nIch hab ihn." to "${pagesLabel(state.input.pageCount)} im Umschlag. Wenn du so weit bist, schau ich rein."
+        else -> "Gib mir\nden Brief." to "Ich lese ihn zuerst und sag dir in Ruhe, was drinsteht."
     }
     val color = if (result) c.lamp(analysis!!.ampel) else c.text
     AnimatedContent(
@@ -240,26 +280,19 @@ private fun Headline(state: UiState, modifier: Modifier = Modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Text(h, style = BriefType.hero, color = col, modifier = Modifier.semantics { heading() })
             if (result) {
-                MonoLabel(s, color = col)
+                Eyebrow(s, color = col)
             } else {
-                Text(s, style = BriefType.bodySmall, color = c.textMuted, modifier = Modifier.width(200.dp))
+                Voice(s, color = c.textSoft)
             }
         }
     }
-}
-
-private fun pagesHeadline(n: Int): String = when (n) {
-    1 -> "Eine\nSeite.\nBereit."
-    2 -> "Zwei\nSeiten.\nBereit."
-    3 -> "Drei\nSeiten.\nBereit."
-    else -> "$n\nSeiten.\nBereit."
 }
 
 @Composable
 private fun IdleActions(onScan: () -> Unit, onPickFile: () -> Unit, onPaste: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            "Oder ein PDF direkt aus der Mail-App teilen.",
+            "Du kannst mir einen Brief auch aus der Mail-App teilen.",
             style = BriefType.bodySmall.copy(fontSize = BriefType.bodySmall.fontSize * 0.93f),
             color = Brief.colors.textFaint,
             modifier = Modifier.padding(start = 104.dp, bottom = 6.dp),
@@ -278,7 +311,7 @@ private fun PagesActions(state: UiState, onCheck: () -> Unit, onDiscard: () -> U
     val source = if (state.input.pages.isEmpty()) "Text" else if (state.input.pages.all { it.mimeType == "application/pdf" }) "PDF" else "Scan"
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(Modifier.padding(start = 116.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            MonoLabel("IM UMSCHLAG")
+            Eyebrow("IM UMSCHLAG")
             PageStack(state.input.pageCount)
             Text(
                 "${pagesLabel(state.input.pageCount)} · $source ${state.receivedAt?.let { dayMonth.format(it) }.orEmpty()}",
@@ -289,8 +322,8 @@ private fun PagesActions(state: UiState, onCheck: () -> Unit, onDiscard: () -> U
         state.error?.let {
             Text(it.message, style = BriefType.bodySmall, color = c.text, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive })
         }
-        PrimaryButton(if (state.error != null) "Noch mal prüfen" else "Ampel prüfen", onCheck)
-        TextLink("Seiten verwerfen", onDiscard, Modifier.fillMaxWidth())
+        PrimaryButton(if (state.error != null) "Noch mal versuchen" else "Lies du ihn für mich", onCheck)
+        TextLink("Doch nicht", onDiscard, Modifier.fillMaxWidth())
     }
 }
 
@@ -304,7 +337,7 @@ private fun CheckingSteps(pages: Int) {
             step++
         }
     }
-    val steps = listOf("${pagesLabel(pages)} gelesen", "Ton und Absender", "Fristen suchen")
+    val steps = listOf(if (pages == 1) "Ich lese den Brief" else "Ich lese alle $pages Seiten", "Ich schaue, wer schreibt und wie", "Ich suche nach Fristen")
     Column(
         Modifier.padding(start = 116.dp, bottom = 120.dp).semantics { liveRegion = LiveRegionMode.Polite },
         verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -327,7 +360,7 @@ private fun CheckingSteps(pages: Int) {
                 )
                 Text(
                     label,
-                    style = BriefType.data.copy(fontSize = BriefType.data.fontSize * 0.87f, fontWeight = FontWeight.Normal),
+                    style = BriefType.bodySmall,
                     color = when {
                         active -> c.text
                         done -> c.textSoft
@@ -356,14 +389,15 @@ private fun ResultPeek(state: UiState, onOpenResult: () -> Unit, onDiscard: () -
     Column(
         Modifier
             .fillMaxWidth()
-            .background(c.surface, RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-            .drawBehind { drawLine(Color.White.copy(alpha = 0.06f), Offset(28.dp.toPx(), 0f), Offset(size.width - 28.dp.toPx(), 0f), 1.dp.toPx()) }
+            .shadow(30.dp, RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp), clip = false, ambientColor = Color(0xFF5A3A22), spotColor = Color(0xFF5A3A22))
+            .background(c.surface, RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
             .navigationBarsPadding()
             .padding(start = 20.dp, end = 20.dp, top = 26.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        MonoLabel(listOfNotNull(a.sender.uppercase(), a.letterDate).joinToString(" · "))
+        Voice("Ich hab ihn gelesen.", color = c.textMuted)
         Text(a.title, style = BriefType.titleSmall, color = c.text)
+        Eyebrow(listOfNotNull(a.sender, a.letterDate).joinToString(" · "))
         Text(a.summary, style = BriefType.body, color = c.textSoft)
         Spacer(Modifier.height(4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -388,8 +422,8 @@ private fun ResultPeek(state: UiState, onOpenResult: () -> Unit, onDiscard: () -
         PrimaryButton(
             when (a.ampel) {
                 Ampel.ROT -> "Was heißt das für mich?"
-                Ampel.GELB -> "Was soll ich tun?"
-                Ampel.GRUEN -> "Ergebnis ansehen"
+                Ampel.GELB -> "Was ist zu tun?"
+                Ampel.GRUEN -> "Zeig mir, was drinsteht"
             },
             onOpenResult,
             trailingIcon = BriefIcons.Arrow,

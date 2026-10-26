@@ -4,57 +4,66 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import de.briefampel.app.R
 
+/**
+ * Fraunces mit weicher Achse (SOFT) – klingt wie ein Mensch, nicht wie ein Formular.
+ * opsz folgt der Größe, damit große Zeilen elegant und kleine robust bleiben.
+ */
 @OptIn(ExperimentalTextApi::class)
-private fun variable(res: Int, weight: Int, opsz: Float? = null) = Font(
-    res,
+private fun fraunces(weight: Int, italic: Boolean = false, opsz: Float = 72f) = Font(
+    if (italic) R.font.fraunces_italic else R.font.fraunces,
     weight = FontWeight(weight),
+    style = if (italic) FontStyle.Italic else FontStyle.Normal,
     variationSettings = FontVariation.Settings(
-        *listOfNotNull(FontVariation.weight(weight), opsz?.let { FontVariation.Setting("opsz", it) }).toTypedArray(),
+        FontVariation.weight(weight),
+        FontVariation.Setting("opsz", opsz),
+        FontVariation.Setting("SOFT", 100f),
+        FontVariation.Setting("WONK", 0f),
     ),
 )
 
-/** Bricolage Grotesque – Überschriften mit Charakter. */
-val Display = FontFamily(
-    variable(R.font.bricolage_grotesque, 600, 48f),
-    variable(R.font.bricolage_grotesque, 700, 48f),
-    variable(R.font.bricolage_grotesque, 800, 96f),
+@OptIn(ExperimentalTextApi::class)
+private fun nunito(weight: Int) = Font(
+    R.font.nunito_sans,
+    weight = FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight), FontVariation.Setting("opsz", 12f)),
 )
 
-/** Source Sans 3 – ruhiger Fließtext. */
-val Body = FontFamily(
-    variable(R.font.source_sans_3, 400),
-    variable(R.font.source_sans_3, 600),
-    variable(R.font.source_sans_3, 700),
+/** Überschriften, Zahlen, die persönliche Stimme. */
+val Serif = FontFamily(
+    fraunces(400), fraunces(500), fraunces(600),
+    fraunces(400, italic = true), fraunces(500, italic = true),
 )
 
-/** IBM Plex Mono – Daten, Fristen, Aktenzeichen. */
-val Mono = FontFamily(
-    Font(R.font.plex_mono_regular, FontWeight.Normal),
-    Font(R.font.plex_mono_medium, FontWeight.Medium),
-    Font(R.font.plex_mono_semibold, FontWeight.SemiBold),
-)
+/** Ruhiger, runder Fließtext. */
+val Sans = FontFamily(nunito(400), nunito(600), nunito(700), nunito(800))
+
+private val tight = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both)
 
 object BriefType {
-    val hero = TextStyle(fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp, lineHeight = 40.sp, letterSpacing = (-0.035).em)
-    val heroLarge = hero.copy(fontSize = 44.sp, lineHeight = 43.sp, letterSpacing = (-0.04).em)
-    val title = TextStyle(fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 31.sp, letterSpacing = (-0.02).em)
-    val titleSmall = title.copy(fontSize = 25.sp, lineHeight = 28.sp)
-    val heading = TextStyle(fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 36.sp, lineHeight = 36.sp, letterSpacing = (-0.035).em)
-    val brand = TextStyle(fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 21.sp, letterSpacing = (-0.02).em)
-    val lead = TextStyle(fontFamily = Body, fontSize = 18.sp, lineHeight = 26.sp)
-    val body = TextStyle(fontFamily = Body, fontSize = 16.5.sp, lineHeight = 24.sp)
-    val bodySmall = TextStyle(fontFamily = Body, fontSize = 15.sp, lineHeight = 21.sp)
-    val button = TextStyle(fontFamily = Body, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-    val buttonSmall = TextStyle(fontFamily = Body, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-    val fine = TextStyle(fontFamily = Body, fontSize = 12.sp, lineHeight = 16.sp)
-    val label = TextStyle(fontFamily = Mono, fontSize = 11.5.sp, letterSpacing = 0.1.em)
-    val data = TextStyle(fontFamily = Mono, fontWeight = FontWeight.Medium, fontSize = 15.sp)
-    val countdown = TextStyle(fontFamily = Mono, fontWeight = FontWeight.SemiBold, fontSize = 84.sp, lineHeight = 70.sp, letterSpacing = (-0.04).em)
-    val paper = TextStyle(fontFamily = Body, fontSize = 14.5.sp, lineHeight = 22.sp)
+    val hero = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Medium, fontSize = 38.sp, lineHeight = 41.sp, letterSpacing = (-0.02).em, lineHeightStyle = tight)
+    val heroLarge = hero.copy(fontSize = 40.sp, lineHeight = 43.sp)
+    val title = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Medium, fontSize = 27.sp, lineHeight = 32.sp, letterSpacing = (-0.01).em)
+    val titleSmall = title.copy(fontSize = 24.sp, lineHeight = 29.sp)
+    val heading = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Medium, fontSize = 34.sp, lineHeight = 38.sp, letterSpacing = (-0.02).em)
+    val brand = TextStyle(fontFamily = Serif, fontWeight = FontWeight.SemiBold, fontSize = 21.sp, letterSpacing = (-0.01).em)
+    /** Die persönliche Stimme: kursiv, wie eine Notiz von jemandem. */
+    val voice = TextStyle(fontFamily = Serif, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Normal, fontSize = 19.sp, lineHeight = 27.sp)
+    val lead = TextStyle(fontFamily = Sans, fontSize = 18.sp, lineHeight = 27.sp)
+    val body = TextStyle(fontFamily = Sans, fontSize = 16.5.sp, lineHeight = 25.sp)
+    val bodySmall = TextStyle(fontFamily = Sans, fontSize = 15.sp, lineHeight = 22.sp)
+    val button = TextStyle(fontFamily = Sans, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
+    val buttonSmall = TextStyle(fontFamily = Sans, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+    val fine = TextStyle(fontFamily = Sans, fontSize = 12.5.sp, lineHeight = 17.sp)
+    val label = TextStyle(fontFamily = Sans, fontWeight = FontWeight.Bold, fontSize = 11.5.sp, letterSpacing = 0.12.em)
+    val data = TextStyle(fontFamily = Sans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+    val countdown = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Medium, fontSize = 88.sp, lineHeight = 80.sp, letterSpacing = (-0.03).em)
+    val paper = TextStyle(fontFamily = Sans, fontSize = 14.5.sp, lineHeight = 22.sp)
 }

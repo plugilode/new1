@@ -3,16 +3,25 @@ package de.briefampel.app.domain
 import java.time.LocalDate
 
 enum class Ampel(val label: String, val tag: String, val headline: String, val promise: String) {
-    ROT("Rot", "ROT · UNANGENEHM", "Lieber\nnicht\nlesen.", "Ich hab ihn gelesen. Hier steht alles, was du wissen musst."),
-    GELB("Gelb", "GELB · HANDELN, KEIN ÄRGER", "Kümmern.\nAber ganz\nsachlich.", "Du musst etwas tun – Ärger gibt es keinen."),
-    GRUEN("Grün", "GRÜN · HARMLOS", "Ganz\nentspannt\nlesen.", "Nichts Unangenehmes drin. Versprochen.");
+    ROT(
+        "Rot", "UNANGENEHM – ABER LÖSBAR", "Den musst du\nnicht lesen.",
+        "Atme durch. Ich hab ihn gelesen – und die Antwort schreiben wir zusammen.",
+    ),
+    GELB(
+        "Gelb", "KEIN ÄRGER, NUR ERLEDIGEN", "Da ist was\nzu tun.",
+        "Nichts Schlimmes. Eine Kleinigkeit, die wir schnell vom Tisch haben.",
+    ),
+    GRUEN(
+        "Grün", "ALLES GUT", "Den kannst du\nruhig lesen.",
+        "Nichts Unangenehmes drin. Versprochen.",
+    );
 
     /** Was TalkBack vorliest. */
     val spoken: String
         get() = when (this) {
-            ROT -> "Ampel: Rot – lieber nicht lesen"
-            GELB -> "Ampel: Gelb – kümmern, aber sachlich"
-            GRUEN -> "Ampel: Grün – harmlos"
+            ROT -> "Ampel: Rot – unangenehm, du musst ihn nicht lesen"
+            GELB -> "Ampel: Gelb – etwas zu tun, kein Ärger"
+            GRUEN -> "Ampel: Grün – alles gut"
         }
 
     companion object {

@@ -21,7 +21,7 @@ class AnalysisParserTest {
         assertEquals(Ampel.ROT, a.ampel)
         assertEquals("Inkasso Nordwest GmbH", a.sender)
         assertEquals(LocalDate.of(2026, 10, 28), a.deadline)
-        assertEquals(listOf("WOLLEN", "TON", "WENN NICHTS", "MEIN RAT"), a.facts.map { it.label })
+        assertEquals(listOf("Was sie wollen", "Wie es klingt", "Wenn du nichts tust", "Mein Rat"), a.facts.map { it.label })
         assertTrue(a.facts.last().emphasis)
         assertEquals(listOf("Forderung bestreiten", "Vertrag anfordern"), a.suggestions)
     }

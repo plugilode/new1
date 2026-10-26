@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Briefampel" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/asphalt</item>
+        <item name="android:windowBackground">@color/espresso</item>
     </style>
 
     <style name="Theme.Briefampel.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/asphalt</item>
+        <item name="windowSplashScreenBackground">@color/espresso</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_ampel</item>
         <item name="postSplashScreenTheme">@style/Theme.Briefampel</item>
     </style>

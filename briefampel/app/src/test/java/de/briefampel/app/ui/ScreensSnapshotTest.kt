@@ -29,7 +29,7 @@ class ScreensSnapshotTest {
     private val threePages = LetterInput(List(3) { LetterInput.Page("content://p$it", "image/jpeg") }, null)
     private val base = UiState(input = threePages, receivedAt = LocalDateTime.now(), checkedAt = LocalDateTime.now())
 
-    private fun shot(dark: Boolean = true, content: @Composable () -> Unit) {
+    private fun shot(dark: Boolean = false, content: @Composable () -> Unit) {
         paparazzi.unsafeUpdateConfig(deviceConfig = DeviceConfig.PIXEL_5.copy(nightMode = if (dark) NightMode.NIGHT else NightMode.NOTNIGHT))
         paparazzi.snapshot { BriefampelTheme(dark = dark, reducedMotion = true, content = content) }
     }
@@ -49,7 +49,11 @@ class ScreensSnapshotTest {
 
     @Test fun result_red() = shot { ResultScreen(base.copy(screen = Screen.RESULT, phase = Phase.RESULT, analysis = SampleProvider.red(today)), {}, {}, {}) }
 
-    @Test fun result_yellow_light() = shot(dark = false) {
+    @Test fun home_result_red_dark() = shot(dark = true) { home(base.copy(phase = Phase.RESULT, analysis = SampleProvider.red(today))) }
+
+    @Test fun result_red_dark() = shot(dark = true) { ResultScreen(base.copy(screen = Screen.RESULT, phase = Phase.RESULT, analysis = SampleProvider.red(today)), {}, {}, {}) }
+
+    @Test fun result_yellow() = shot {
         ResultScreen(base.copy(screen = Screen.RESULT, phase = Phase.RESULT, analysis = SampleProvider.yellow(today)), {}, {}, {})
     }
 

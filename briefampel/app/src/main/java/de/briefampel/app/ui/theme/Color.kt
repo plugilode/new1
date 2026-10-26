@@ -6,8 +6,8 @@ import androidx.compose.ui.graphics.Color
 import de.briefampel.app.domain.Ampel
 
 /**
- * „Nur die Ampel hat Farbe.“ Alles andere ist Asphalt und Kreide.
- * Lampenfarben sind Bedeutung, nie Deko.
+ * Warmes Briefpapier und Tinte statt Asphalt: Die App soll sich anfühlen wie jemand Vertrautes,
+ * der dir den Brief abnimmt. Die Ampelfarben sind weich (Koralle, Honig, Salbei) – Bedeutung, kein Alarm.
  */
 @Immutable
 data class BriefColors(
@@ -19,12 +19,16 @@ data class BriefColors(
     val textSoft: Color,
     val textMuted: Color,
     val textFaint: Color,
-    /** Hauptknöpfe: kreideweiß auf dunkel, asphalt auf hell. */
     val primary: Color,
     val onPrimary: Color,
     val red: Color,
     val amber: Color,
     val green: Color,
+    /** Warmes Licht, das immer leicht im Raum liegt – wie eine Lampe am Abend. */
+    val ambient: Color,
+    val housingTop: Color,
+    val housingBottom: Color,
+    val housingEdge: Color,
     val isDark: Boolean,
 ) {
     fun lamp(ampel: Ampel): Color = when (ampel) {
@@ -35,9 +39,9 @@ data class BriefColors(
 }
 
 object Lamp {
-    val Red = Color(0xFFFF5A47)
-    val Amber = Color(0xFFF5B544)
-    val Green = Color(0xFF3DD68C)
+    val Red = Color(0xFFEC6A4C)
+    val Amber = Color(0xFFF0AE45)
+    val Green = Color(0xFF67B386)
 
     fun glow(ampel: Ampel): Color = when (ampel) {
         Ampel.ROT -> Red
@@ -46,44 +50,49 @@ object Lamp {
     }
 }
 
-val Chalk = Color(0xFFF3F0E8)
-val Asphalt = Color(0xFF121417)
-val Paper = Color(0xFFF3F0E8)
-val Ink = Color(0xFF1E2126)
-
-val DarkColors = BriefColors(
-    background = Asphalt,
-    surface = Color(0xFF1A1D21),
-    surfaceLine = Color(0xFF2A2E34),
-    line = Color(0xFF2E3238),
-    text = Chalk,
-    textSoft = Color(0xFFD6D8DB),
-    textMuted = Color(0xFFA3A8AF),
-    textFaint = Color(0xFF8E949B),
-    primary = Chalk,
-    onPrimary = Asphalt,
-    red = Lamp.Red,
-    amber = Lamp.Amber,
-    green = Lamp.Green,
-    isDark = true,
-)
+val Paper = Color(0xFFFFFBF4)
+val Ink = Color(0xFF2B221D)
 
 val LightColors = BriefColors(
-    background = Color(0xFFECEEF1),
-    surface = Color(0xFFFFFFFF),
-    surfaceLine = Color(0xFFDADDE2),
-    line = Color(0xFFD3D6DB),
-    text = Color(0xFF15181C),
-    textSoft = Color(0xFF2A2E34),
-    textMuted = Color(0xFF4E545C),
-    textFaint = Color(0xFF5E646C),
-    primary = Color(0xFF15181C),
-    onPrimary = Chalk,
-    // Dunklere Textvarianten für Kontrast auf hellem Grund; die Lampen selbst bleiben leuchtend.
-    red = Color(0xFFB42318),
-    amber = Color(0xFF8A5200),
-    green = Color(0xFF12784A),
+    background = Color(0xFFF5EEE3),
+    surface = Color(0xFFFFFBF4),
+    surfaceLine = Color(0xFFE8DDCD),
+    line = Color(0xFFE0D3C1),
+    text = Ink,
+    textSoft = Color(0xFF4A3E36),
+    textMuted = Color(0xFF6B5D52),
+    textFaint = Color(0xFF8A7B6E),
+    primary = Color(0xFF2E241F),
+    onPrimary = Color(0xFFFBF4E9),
+    red = Color(0xFFB8472D),
+    amber = Color(0xFF94600F),
+    green = Color(0xFF2E7650),
+    ambient = Color(0xFFF2B866),
+    housingTop = Color(0xFFFFFCF7),
+    housingBottom = Color(0xFFEDE2D2),
+    housingEdge = Color(0xFFE2D5C3),
     isDark = false,
 )
 
-val LocalBriefColors = staticCompositionLocalOf { DarkColors }
+val DarkColors = BriefColors(
+    background = Color(0xFF1C1714),
+    surface = Color(0xFF26201C),
+    surfaceLine = Color(0xFF372E28),
+    line = Color(0xFF41372F),
+    text = Color(0xFFF5ECDF),
+    textSoft = Color(0xFFE4D8C8),
+    textMuted = Color(0xFFBBAC9C),
+    textFaint = Color(0xFF948576),
+    primary = Color(0xFFF5ECDF),
+    onPrimary = Color(0xFF1C1714),
+    red = Lamp.Red,
+    amber = Lamp.Amber,
+    green = Lamp.Green,
+    ambient = Color(0xFFE59A4A),
+    housingTop = Color(0xFF342B26),
+    housingBottom = Color(0xFF221C18),
+    housingEdge = Color(0xFF41362F),
+    isDark = true,
+)
+
+val LocalBriefColors = staticCompositionLocalOf { LightColors }

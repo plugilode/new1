@@ -7,8 +7,8 @@ Plan und Entscheidungen: [PLAN.md](PLAN.md) · Design-Entwurf (M0): https://clau
 ## Stand: M1
 
 - Kotlin + Jetpack Compose, ein App-Modul, minSdk 26, targetSdk 35
-- Design „Nur die Ampel hat Farbe“ aus dem Entwurf umgesetzt, Hell und Dunkel
-- Selbst gezeichnete Ampel: pulsiert beim Prüfen, Lampe zündet mit Schein, Bildschirm färbt sich leicht ein, Vibration je Farbe
+- Design „Jemand Vertrautes nimmt dir den Brief ab“: warmes Briefpapier und Tinte, Fraunces und Nunito Sans, die App spricht in der Ich-Form; Hell und Dunkel (Abendlicht)
+- Selbst gezeichnete Ampel aus Keramik mit warmem Licht: pulsiert beim Lesen, Lampe glüht weich auf, Bildschirm färbt sich leicht ein, Vibration je Farbe
 - Eingang: Scannen (ML Kit Document Scanner), Datei (PDF/Bilder), Text einfügen, Teilen-Ziel aus anderen Apps
 - Ergebnis mit Frist-Leiste, Fakten, versiegeltem Umschlag; Antwort-Werkbank mit Vorschlägen, Ton, Absender, Live-Schreiben mit Stopp, Kopieren, Teilen, Neu formulieren
 - Einwilligung vor der ersten Prüfung; Absender nur auf dem Gerät (DataStore, kein Backup)
@@ -29,4 +29,4 @@ Voraussetzung: Android Studio (oder JDK 17+ und Android SDK 35).
 
 - Paket-ID `de.briefampel.app` ist ein Platzhalter (lässt sich nach dem ersten Upload nicht mehr ändern)
 - `PRIVACY_URL` in `ui/screen/Sheets.kt` auf die echte Datenschutzerklärung setzen
-- Schriften: Bricolage Grotesque, Source Sans 3, IBM Plex Mono (SIL Open Font License, siehe `docs/font-licenses`)
+- Schriften: Fraunces, Nunito Sans (SIL Open Font License, siehe `docs/font-licenses`)

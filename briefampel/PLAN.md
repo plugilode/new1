@@ -100,7 +100,8 @@ Bewusst **nicht**: Konfetti, Maskottchen, Glas-Effekte. Die App soll Angst nehme
 - Farben 1:1 aus dem Prototyp (Light + Dark). Ampelfarben sind Bedeutung, nicht Deko, und bleiben getrennt vom blauen Akzent.
 - Schriften: Bricolage Grotesque für Überschriften, Source Sans 3 für Text, IBM Plex Mono für Datum, Frist und Aktenzeichen.
 - Touch-Ziele ≥ 48 dp, sichtbarer Fokus, TalkBack liest „Ampel: Rot – lieber nicht lesen“.
-- **Konzept „Nur die Ampel hat Farbe“:** Die App ist sonst in Asphalt-Grau (#121417) und Kreideweiß (#F3F0E8) gehalten, Hauptknöpfe sind kreideweiß. Farbe kommt ausschließlich aus den drei Lampen (Rot #FF5A47, Gelb #F5B544, Grün #3DD68C; im hellen Modus dunklere Textvarianten für Kontrast). Das Ampel-Gehäuse bleibt auch im hellen Modus dunkel.
+- **Überarbeitet (M1): „Jemand Vertrautes nimmt dir den Brief ab.“** Warmes Briefpapier (#F5EEE3) und Tinte (#2B221D), dunkel als Espresso-Abendlicht (#1C1714). Ampel als Keramik-Gehäuse mit weich glühenden Lampen (Koralle #EC6A4C, Honig #F0AE45, Salbei #67B386). Schriften Fraunces (weich, persönlich) und Nunito Sans. Die App spricht in der Ich-Form und tröstet, statt zu warnen.
+- *Vorheriges Konzept „Nur die Ampel hat Farbe“ (abgelöst, wirkte zu kalt):* Die App ist sonst in Asphalt-Grau (#121417) und Kreideweiß (#F3F0E8) gehalten, Hauptknöpfe sind kreideweiß. Farbe kommt ausschließlich aus den drei Lampen (Rot #FF5A47, Gelb #F5B544, Grün #3DD68C; im hellen Modus dunklere Textvarianten für Kontrast). Das Ampel-Gehäuse bleibt auch im hellen Modus dunkel.
 - Design-Entwurf (M0): https://claude.ai/artifact/W3FxiyNnmWU9t6h9tNtvkr
 
 ---

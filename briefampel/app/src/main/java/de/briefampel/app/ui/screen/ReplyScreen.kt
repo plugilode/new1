@@ -70,9 +70,10 @@ import de.briefampel.app.ui.components.BriefIcons
 import de.briefampel.app.ui.components.Chip
 import de.briefampel.app.ui.components.CircleIconButton
 import de.briefampel.app.ui.components.Disclaimer
-import de.briefampel.app.ui.components.MonoLabel
+import de.briefampel.app.ui.components.Eyebrow
 import de.briefampel.app.ui.components.OutlineButton
 import de.briefampel.app.ui.components.PrimaryButton
+import de.briefampel.app.ui.components.Voice
 import de.briefampel.app.ui.theme.Brief
 import de.briefampel.app.ui.theme.BriefType
 import de.briefampel.app.ui.theme.Ink
@@ -119,17 +120,17 @@ fun ReplyScreen(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             CircleIconButton(BriefIcons.Back, "Zurück zum Ergebnis", onBack)
             Box(Modifier.size(10.dp).shadow(6.dp, CircleShape, ambientColor = Lamp.glow(a.ampel), spotColor = Lamp.glow(a.ampel)).background(Lamp.glow(a.ampel), CircleShape))
-            MonoLabel(("AN " + a.sender.uppercase() + (a.reference?.let { " · $it" } ?: "")), Modifier.weight(1f))
+            Eyebrow(("An " + a.sender + (a.reference?.let { " · $it" } ?: "")), Modifier.weight(1f))
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Was soll rein?", style = BriefType.heading, color = c.text, modifier = Modifier.semantics { heading() })
-            Text("Stichworte reichen. Den Rest schreibe ich – und erfinde nichts dazu.", style = BriefType.body, color = c.textMuted)
+            Text("Was soll ich\nfür dich sagen?", style = BriefType.heading, color = c.text, modifier = Modifier.semantics { heading() })
+            Voice("Ein paar Stichworte reichen. Ich formulier das ordentlich – und erfinde nichts dazu.")
         }
 
         if (a.suggestions.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                MonoLabel("VORSCHLÄGE · ANTIPPEN")
+                Eyebrow("Meine Vorschläge – einfach antippen")
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     a.suggestions.forEach { s ->
                         Chip(s, Keywords.contains(reply.keywords, s), { onToggleSuggestion(s) })
@@ -139,7 +140,7 @@ fun ReplyScreen(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            MonoLabel("DEINE STICHWORTE")
+            Eyebrow("Deine Stichworte")
             BasicTextField(
                 value = reply.keywords,
                 onValueChange = onKeywords,
@@ -156,7 +157,7 @@ fun ReplyScreen(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            MonoLabel("TON")
+            Eyebrow("Wie soll es klingen?")
             ToneSegmented(reply.tone, onTone)
         }
 
@@ -165,9 +166,9 @@ fun ReplyScreen(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             val words = Keywords.lines(reply.text.replace(' ', '\n')).size
             val status = when {
-                reply.writing -> "SCHREIBT · $words WÖRTER"
-                reply.text.isNotEmpty() -> "FERTIG · $words WÖRTER"
-                else -> "NOCH NICHTS GESCHRIEBEN"
+                reply.writing -> "Ich schreibe … $words Wörter"
+                reply.text.isNotEmpty() -> "Fertig – schau mal drüber"
+                else -> "Sobald du magst, schreib ich los"
             }
             Row(
                 Modifier.semantics { liveRegion = LiveRegionMode.Polite },
@@ -175,7 +176,7 @@ fun ReplyScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 if (reply.writing) Box(Modifier.size(8.dp).alpha(pulse()).background(c.text, CircleShape))
-                MonoLabel(status, color = if (reply.writing) c.text else c.textFaint)
+                Text(status, style = BriefType.voice.copy(fontSize = BriefType.voice.fontSize * 0.85f), color = if (reply.writing) c.text else c.textMuted)
             }
             if (reply.writing) {
                 Row(
@@ -194,7 +195,7 @@ fun ReplyScreen(
         }
 
         if (reply.text.isEmpty() && !reply.writing) {
-            PrimaryButton("Antwort schreiben", onWrite, icon = BriefIcons.Pen, enabled = Keywords.lines(reply.keywords).isNotEmpty())
+            PrimaryButton("Schreib du sie für mich", onWrite, icon = BriefIcons.Pen, enabled = Keywords.lines(reply.keywords).isNotEmpty())
         } else {
             PaperLetter(reply.text, reply.writing)
         }
@@ -276,7 +277,7 @@ private fun SenderRow(sender: Sender, onSave: (Sender) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                MonoLabel("ABSENDER · NUR AUF DIESEM HANDY")
+                Eyebrow("Absender · bleibt nur auf deinem Handy")
                 Text(sender.oneLine().ifBlank { "Noch leer – antippen zum Ausfüllen" }, style = BriefType.bodySmall, color = if (sender.isEmpty) c.textFaint else c.text)
             }
             Icon(if (open) BriefIcons.Close else BriefIcons.ChevronDown, null, tint = c.textFaint, modifier = Modifier.size(18.dp))
@@ -290,10 +291,10 @@ private fun SenderRow(sender: Sender, onSave: (Sender) -> Unit) {
 @Composable
 fun SenderFields(sender: Sender, onSave: (Sender) -> Unit, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Field("NAME", sender.name) { onSave(sender.copy(name = it)) }
-        Field("STRASSE UND NR.", sender.street) { onSave(sender.copy(street = it)) }
-        Field("PLZ UND ORT", sender.city) { onSave(sender.copy(city = it)) }
-        Field("E-MAIL (OPTIONAL)", sender.email) { onSave(sender.copy(email = it)) }
+        Field("Name", sender.name) { onSave(sender.copy(name = it)) }
+        Field("Straße und Nr.", sender.street) { onSave(sender.copy(street = it)) }
+        Field("PLZ und Ort", sender.city) { onSave(sender.copy(city = it)) }
+        Field("E-Mail (optional)", sender.email) { onSave(sender.copy(email = it)) }
     }
 }
 
@@ -301,7 +302,7 @@ fun SenderFields(sender: Sender, onSave: (Sender) -> Unit, modifier: Modifier = 
 private fun Field(label: String, value: String, onChange: (String) -> Unit) {
     val c = Brief.colors
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        MonoLabel(label)
+        Eyebrow(label)
         BasicTextField(
             value = value,
             onValueChange = onChange,

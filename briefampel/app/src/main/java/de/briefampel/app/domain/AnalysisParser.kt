@@ -24,10 +24,10 @@ object AnalysisParser {
         if (title.isNullOrBlank() || summary.isNullOrBlank()) throw AnalysisException(AnalysisError.UNREADABLE_ANSWER)
 
         val facts = buildList {
-            obj.string("forderung")?.let { add(Fact("WOLLEN", it)) }
-            obj.string("ton")?.let { add(Fact("TON", it)) }
-            obj.string("wenn_nichts")?.let { add(Fact("WENN NICHTS", it)) }
-            obj.string("rat")?.let { add(Fact("MEIN RAT", it, emphasis = true)) }
+            obj.string("forderung")?.let { add(Fact("Was sie wollen", it)) }
+            obj.string("ton")?.let { add(Fact("Wie es klingt", it)) }
+            obj.string("wenn_nichts")?.let { add(Fact("Wenn du nichts tust", it)) }
+            obj.string("rat")?.let { add(Fact("Mein Rat", it, emphasis = true)) }
         }
         return LetterAnalysis(
             ampel = Ampel.parse(obj.string("ampel")),

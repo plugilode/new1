@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import de.briefampel.app.domain.Fact
 import de.briefampel.app.domain.LetterInput
 import de.briefampel.app.domain.Sender
-import de.briefampel.app.ui.components.MonoLabel
+import de.briefampel.app.ui.components.Eyebrow
 import de.briefampel.app.ui.components.OutlineButton
 import de.briefampel.app.ui.components.PrimaryButton
 import de.briefampel.app.ui.components.TextLink
@@ -59,7 +59,7 @@ private fun BriefSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = c.surface,
-        scrimColor = Color(0xFF08090B).copy(alpha = 0.55f),
+        scrimColor = Color(0xFF2A1A10).copy(alpha = 0.45f),
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
         dragHandle = {
             Box(Modifier.padding(top = 12.dp, bottom = 8.dp).size(40.dp, 5.dp).background(c.line, RoundedCornerShape(3.dp)))
@@ -79,19 +79,19 @@ fun ConsentSheet(onAccept: () -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
     BriefSheet(onDismiss) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MonoLabel("EINMAL, BEVOR ICH LESE")
-            Text("Dein Brief bleibt\ndein Brief.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
+            Eyebrow("Einmal, bevor ich lese")
+            Text("Dein Brief ist\nbei mir sicher.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
         }
         SheetFacts(
             listOf(
-                Fact("GEHT AN", "Google Gemini, verarbeitet in der EU."),
-                Fact("BLEIBT", "Nirgends. Nach der Antwort ist er vom Server weg."),
-                Fact("KOSTET", "Nichts. Drei Briefe am Tag sind frei."),
-                Fact("IST NICHT", "Rechtsberatung. Ich sortiere und entwerfe, Fristen prüfst du selbst."),
+                Fact("Wer liest mit", "Ich nutze dafür Google Gemini, verarbeitet in der EU."),
+                Fact("Was bleibt", "Nichts. Nach der Antwort ist dein Brief vom Server weg."),
+                Fact("Was es kostet", "Nichts. Drei Briefe am Tag lese ich dir gern umsonst."),
+                Fact("Was ich nicht bin", "Anwalt. Ich sortiere und helfe beim Schreiben – Fristen prüfst du bitte selbst."),
             ),
         )
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            PrimaryButton("Verstanden, los", onAccept)
+            PrimaryButton("Okay, lies ihn", onAccept)
             TextLink("Datenschutz in Ruhe lesen", {
                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_URL)))
             }, Modifier.fillMaxWidth(), color = c.textSoft)
@@ -106,7 +106,7 @@ private fun SheetFacts(facts: List<Fact>) {
         facts.forEachIndexed { i, f ->
             HorizontalDivider(color = c.surfaceLine)
             Row(Modifier.fillMaxWidth().padding(vertical = 14.dp).semantics(mergeDescendants = true) {}, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                MonoLabel(f.label, Modifier.width(92.dp).padding(top = 3.dp))
+                Eyebrow(f.label, Modifier.width(104.dp).padding(top = 4.dp))
                 Text(f.text, style = BriefType.body.copy(fontSize = BriefType.body.fontSize * 0.97f), color = c.text)
             }
             if (i == facts.lastIndex) HorizontalDivider(color = c.surfaceLine)
@@ -121,8 +121,8 @@ fun PasteSheet(onDone: (String) -> Unit, onDismiss: () -> Unit) {
     var text by rememberSaveable { mutableStateOf("") }
     BriefSheet(onDismiss) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MonoLabel("TEXT EINFÜGEN")
-            Text("Kopierten Brief\nhier rein.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
+            Eyebrow("Text einfügen")
+            Text("Gib mir den Text,\nich les ihn.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
         }
         OutlineButton("Aus Zwischenablage einfügen", {
             val clip = context.getSystemService(ClipboardManager::class.java)?.primaryClip
@@ -152,8 +152,8 @@ fun SenderSheet(sender: Sender, onSave: (Sender) -> Unit, onDismiss: () -> Unit)
     val c = Brief.colors
     BriefSheet(onDismiss) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MonoLabel("ABSENDER · NUR AUF DIESEM HANDY")
-            Text("Für deine Antworten.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
+            Eyebrow("Absender · bleibt nur auf deinem Handy")
+            Text("Damit ich in\ndeinem Namen schreibe.", style = BriefType.heading.copy(fontSize = BriefType.heading.fontSize * 0.83f), color = c.text, modifier = Modifier.semantics { heading() })
         }
         SenderFields(sender, onSave)
         PrimaryButton("Fertig", onDismiss)

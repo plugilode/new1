@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,8 +50,8 @@ import de.briefampel.app.domain.Deadline
 import de.briefampel.app.domain.Fact
 import de.briefampel.app.ui.theme.Brief
 import de.briefampel.app.ui.theme.BriefType
-import de.briefampel.app.ui.theme.Chalk
-import de.briefampel.app.ui.theme.Mono
+import de.briefampel.app.ui.theme.Paper
+import de.briefampel.app.ui.theme.Serif
 import de.briefampel.app.ui.theme.Motion
 import java.time.LocalDate
 
@@ -71,7 +70,7 @@ fun DeadlineRing(deadline: LocalDate?, today: LocalDate, color: Color, modifier:
     }
 }
 
-/** Große Frist-Karte: Resttage in 84er Mono und die Zwei-Wochen-Leiste. */
+/** Frist-Karte: wie viel Zeit bleibt – groß, ruhig, mit weichen Tagespunkten. */
 @Composable
 fun DeadlineCard(deadline: LocalDate, today: LocalDate, note: String?, modifier: Modifier = Modifier) {
     val c = Brief.colors
@@ -81,43 +80,42 @@ fun DeadlineCard(deadline: LocalDate, today: LocalDate, note: String?, modifier:
     Column(
         modifier
             .fillMaxWidth()
-            .background(c.surface, RoundedCornerShape(24.dp))
-            .border(1.dp, c.surfaceLine, RoundedCornerShape(24.dp))
-            .padding(20.dp)
+            .shadow(14.dp, RoundedCornerShape(26.dp), clip = false, ambientColor = Color(0x335A3A22), spotColor = Color(0x335A3A22))
+            .background(c.surface, RoundedCornerShape(26.dp))
+            .border(1.dp, c.surfaceLine, RoundedCornerShape(26.dp))
+            .padding(22.dp)
             .semantics(mergeDescendants = true) {
                 contentDescription = "Frist: ${Deadline.daysLabel(days)}, bis ${Deadline.formatDay(deadline)}"
             },
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(if (days < 0) "!" else days.toString(), style = BriefType.countdown, color = accent, modifier = Modifier.alignByBaseline())
-                Text(
-                    if (days == 1L) "Tag" else if (days == 0L) "heute" else "Tage",
-                    style = BriefType.title.copy(fontSize = BriefType.title.fontSize * 0.8f),
-                    color = c.text,
-                    modifier = Modifier.alignByBaseline(),
-                )
-            }
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                MonoLabel("FRIST")
-                Text(Deadline.formatDay(deadline), style = BriefType.data, color = c.text)
-            }
+        Eyebrow(if (days < 0) "Die Frist ist vorbei" else "Du hast noch Zeit bis ${Deadline.formatDay(deadline)}")
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(if (days < 0) "0" else days.toString(), style = BriefType.countdown, color = accent, modifier = Modifier.alignByBaseline())
+            Text(
+                when (days) { 0L -> "heute"; 1L -> "Tag"; else -> "Tage" },
+                style = BriefType.title,
+                color = c.text,
+                modifier = Modifier.alignByBaseline(),
+            )
         }
-        Row(Modifier.fillMaxWidth().clearAndSetSemantics { }, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth().clearAndSetSemantics { }, horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Deadline.barCells(deadline, today).forEachIndexed { i, cell ->
                 val last = i == Deadline.BAR_CELLS - 1
-                val color = when (cell) {
-                    Deadline.Cell.PAST -> c.line
-                    Deadline.Cell.TODAY -> c.text
-                    Deadline.Cell.REMAINING -> if (hot) c.red else c.textFaint
-                }
+                val dot = if (cell == Deadline.Cell.TODAY || last) 12.dp else 9.dp
                 Box(
                     Modifier
-                        .weight(1f)
-                        .height(18.dp)
-                        .then(if (last && hot) Modifier.shadow(8.dp, RoundedCornerShape(3.dp), ambientColor = c.red, spotColor = c.red) else Modifier)
-                        .background(color, RoundedCornerShape(3.dp)),
+                        .size(dot)
+                        .then(if (last) Modifier.shadow(6.dp, CircleShape, clip = false, ambientColor = accent, spotColor = accent) else Modifier)
+                        .background(
+                            when {
+                                cell == Deadline.Cell.PAST -> c.line
+                                cell == Deadline.Cell.TODAY -> c.text
+                                hot -> c.red.copy(alpha = if (last) 1f else 0.55f)
+                                else -> c.textFaint.copy(alpha = if (last) 1f else 0.45f)
+                            },
+                            CircleShape,
+                        ),
                 )
             }
         }
@@ -125,37 +123,44 @@ fun DeadlineCard(deadline: LocalDate, today: LocalDate, note: String?, modifier:
     }
 }
 
-/** Fakten als ruhige Liste, Label in Mono links. */
+/** Fakten wie eine handgeschriebene Liste: kleine Überschrift, darunter der Satz. */
 @Composable
 fun FactList(facts: List<Fact>, modifier: Modifier = Modifier) {
     val c = Brief.colors
-    Column(modifier.fillMaxWidth()) {
-        facts.forEachIndexed { i, fact ->
-            HorizontalDivider(color = c.surfaceLine)
-            Row(
-                Modifier.fillMaxWidth().padding(vertical = 16.dp).semantics(mergeDescendants = true) {},
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        facts.forEach { fact ->
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (fact.emphasis) {
+                            Modifier.background(c.ambient.copy(alpha = if (c.isDark) 0.12f else 0.16f), RoundedCornerShape(20.dp)).padding(18.dp)
+                        } else {
+                            Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        },
+                    )
+                    .semantics(mergeDescendants = true) {},
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                MonoLabel(fact.label, Modifier.width(96.dp).padding(top = 4.dp), color = if (fact.emphasis) c.text else c.textFaint)
-                Text(
-                    highlightAmounts(fact.text),
-                    style = BriefType.body.copy(fontWeight = if (fact.emphasis) FontWeight.SemiBold else FontWeight.Normal),
-                    color = c.text,
-                )
+                Eyebrow(fact.label, color = if (fact.emphasis) c.textSoft else c.textFaint)
+                if (fact.emphasis) {
+                    Voice(fact.text, color = c.text)
+                } else {
+                    Text(highlightAmounts(fact.text), style = BriefType.body, color = c.text)
+                }
             }
-            if (i == facts.lastIndex) HorizontalDivider(color = c.surfaceLine)
         }
     }
 }
 
 private val amount = Regex("""\d{1,3}(?:\.\d{3})*,\d{2} €""")
 
-/** Beträge in Mono, damit sie sofort ins Auge fallen. */
+/** Beträge in der Serifenschrift, damit sie sofort ins Auge fallen. */
 private fun highlightAmounts(text: String) = buildAnnotatedString {
     var last = 0
     amount.findAll(text).forEach {
         append(text.substring(last, it.range.first))
-        withStyle(SpanStyle(fontFamily = Mono, fontWeight = FontWeight.SemiBold)) { append(it.value) }
+        withStyle(SpanStyle(fontFamily = Serif, fontWeight = FontWeight.SemiBold)) { append(it.value) }
         last = it.range.last + 1
     }
     append(text.substring(last))
@@ -171,7 +176,7 @@ fun SealedEnvelope(pages: Int, open: Boolean, onClick: () -> Unit, modifier: Mod
             .fillMaxWidth()
             .pressable(onClick = onClick)
             .drawBehind {
-                drawRoundRect(Color(0xFF3A3F46), cornerRadius = CornerRadius(20.dp.toPx()), style = Stroke(1.dp.toPx(), pathEffect = dash))
+                drawRoundRect(c.line, cornerRadius = CornerRadius(20.dp.toPx()), style = Stroke(1.dp.toPx(), pathEffect = dash))
             }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -199,9 +204,9 @@ fun SealedEnvelope(pages: Int, open: Boolean, onClick: () -> Unit, modifier: Mod
             }
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(if (open) "Brief wieder zuklappen" else "Brief doch selbst lesen", style = BriefType.body.copy(fontWeight = FontWeight.Bold), color = c.text)
+            Text(if (open) "Brief wieder zuklappen" else "Den Brief doch selbst lesen", style = BriefType.body.copy(fontWeight = FontWeight.Bold), color = c.text)
             Text(
-                if (open) "Unten steht der ganze Text" else "${pagesLabel(pages)} · bleibt zu, bis du willst",
+                if (open) "Unten steht der ganze Text" else "${pagesLabel(pages)} · bleibt verschlossen, bis du willst",
                 style = BriefType.bodySmall.copy(fontSize = BriefType.bodySmall.fontSize * 0.93f),
                 color = c.textFaint,
             )
@@ -225,7 +230,7 @@ fun PageStack(pages: Int, modifier: Modifier = Modifier) {
                     .rotate(r)
                     .size(58.dp, 80.dp)
                     .shadow(10.dp, RoundedCornerShape(4.dp))
-                    .background(Chalk, RoundedCornerShape(4.dp))
+                    .background(Paper, RoundedCornerShape(4.dp))
                     .padding(horizontal = 8.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
