@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Briefampel" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/light_bg</item>
+    </style>
+
+    <style name="Theme.Briefampel.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/light_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_ampel</item>
+        <item name="postSplashScreenTheme">@style/Theme.Briefampel</item>
+    </style>
+</resources>
