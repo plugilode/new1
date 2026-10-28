@@ -75,6 +75,7 @@ fun BriefampelApp(vm: BriefampelViewModel) {
                 onDiscard = vm::discard,
                 onOpenResult = { vm.open(Screen.RESULT) },
                 onOpenSender = { senderOpen = true },
+                onRevealed = vm::revealed,
             )
             Screen.RESULT -> ResultScreen(
                 state = state,

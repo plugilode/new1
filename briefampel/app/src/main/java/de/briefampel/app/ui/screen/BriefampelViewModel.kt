@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 enum class Screen { HOME, RESULT, REPLY }
@@ -42,6 +41,8 @@ data class UiState(
     val receivedAt: LocalDateTime? = null,
     val analysis: LetterAnalysis? = null,
     val checkedAt: LocalDateTime? = null,
+    /** true bis zum ersten Zeigen des Ergebnisses: Klang, Vibration und Zünden nur einmal pro Brief. */
+    val revealPending: Boolean = false,
     val error: AnalysisError? = null,
     val showConsent: Boolean = false,
     val showPaste: Boolean = false,
@@ -132,6 +133,7 @@ class BriefampelViewModel(
                         phase = Phase.RESULT,
                         analysis = analysis,
                         checkedAt = LocalDateTime.now(),
+                        revealPending = true,
                         envelopeOpen = false,
                         reply = ReplyState(keywords = analysis.suggestions.take(2).joinToString("\n")),
                     )
@@ -145,6 +147,8 @@ class BriefampelViewModel(
             }
         }
     }
+
+    fun revealed() = _state.update { it.copy(revealPending = false) }
 
     fun dismissError() = _state.update { it.copy(error = null) }
 
@@ -199,6 +203,4 @@ class BriefampelViewModel(
     }
 
     private fun updateReply(f: (ReplyState) -> ReplyState) = _state.update { it.copy(reply = f(it.reply)) }
-
-    val today: LocalDate get() = de.briefampel.app.domain.Deadline.today()
 }

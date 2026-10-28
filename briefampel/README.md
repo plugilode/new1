@@ -8,7 +8,7 @@ Plan und Entscheidungen: [PLAN.md](PLAN.md) · Design-Entwurf (M0): https://clau
 
 - Kotlin + Jetpack Compose, ein App-Modul, minSdk 26, targetSdk 35
 - Design „Jemand Vertrautes nimmt dir den Brief ab“: warmes Briefpapier und Tinte, Fraunces und Nunito Sans, die App spricht in der Ich-Form; Hell und Dunkel (Abendlicht)
-- Selbst gezeichnete Ampel aus Keramik mit warmem Licht: pulsiert beim Lesen, Lampe glüht weich auf, Bildschirm färbt sich leicht ein, Vibration je Farbe
+- Selbst gezeichnete Ampel aus Keramik mit warmem Licht: pulsiert beim Lesen, Lampe glüht weich auf; dazu ein eigener Klang (`res/raw/reveal_chime.ogg`), still bei Lautlos/Vibration, Bildschirm färbt sich leicht ein, Vibration je Farbe
 - Eingang: Scannen (ML Kit Document Scanner), Datei (PDF/Bilder), Text einfügen, Teilen-Ziel aus anderen Apps
 - Ergebnis mit Frist-Leiste, Fakten, versiegeltem Umschlag; Antwort-Werkbank mit Vorschlägen, Ton, Absender, Live-Schreiben mit Stopp, Kopieren, Teilen, Neu formulieren
 - Einwilligung vor der ersten Prüfung; Absender nur auf dem Gerät (DataStore, kein Backup)

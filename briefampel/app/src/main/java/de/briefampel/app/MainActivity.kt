@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import de.briefampel.app.domain.LetterInput
+import de.briefampel.app.ui.Sounds
 import de.briefampel.app.ui.screen.BriefampelApp
 import de.briefampel.app.ui.screen.BriefampelViewModel
 import de.briefampel.app.ui.theme.BriefampelTheme
@@ -25,12 +26,18 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
         )
         super.onCreate(savedInstanceState)
+        Sounds.preload(this)
         if (savedInstanceState == null) handleShare(intent)
         setContent {
             BriefampelTheme {
                 BriefampelApp(vm)
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (isFinishing) Sounds.release()
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {

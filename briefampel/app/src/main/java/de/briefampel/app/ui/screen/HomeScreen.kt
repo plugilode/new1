@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import de.briefampel.app.domain.Ampel
 import de.briefampel.app.domain.Deadline
 import de.briefampel.app.ui.Haptics
+import de.briefampel.app.ui.Sounds
 import de.briefampel.app.ui.components.AmpelMark
 import de.briefampel.app.ui.components.BriefIcons
 import de.briefampel.app.ui.components.CircleIconButton
@@ -80,7 +81,6 @@ import de.briefampel.app.ui.theme.Lamp
 import de.briefampel.app.ui.theme.Motion
 import de.briefampel.app.ui.theme.Serif
 import kotlinx.coroutines.delay
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 private val dayMonth = DateTimeFormatter.ofPattern("dd.MM.")
@@ -95,25 +95,30 @@ fun HomeScreen(
     onDiscard: () -> Unit,
     onOpenResult: () -> Unit,
     onOpenSender: () -> Unit,
+    onRevealed: () -> Unit = {},
 ) {
     val c = Brief.colors
     val analysis = state.analysis
     val result = state.phase == Phase.RESULT && analysis != null
     val lightState = when {
         state.phase == Phase.CHECKING -> LightState.Checking
-        result -> LightState.Lit(analysis!!.ampel)
+        result -> LightState.Lit(analysis!!.ampel, animate = state.revealPending)
         else -> LightState.Off
     }
 
     val context = LocalContext.current
-    LaunchedEffect(result, analysis) {
-        if (result) Haptics.reveal(context, analysis!!.ampel)
+    LaunchedEffect(result, state.revealPending) {
+        if (result && state.revealPending) {
+            Haptics.reveal(context, analysis!!.ampel)
+            Sounds.reveal(context)
+            onRevealed()
+        }
     }
 
     var lightTop by remember { mutableStateOf(Offset.Zero) }
     Box(Modifier.fillMaxSize().background(c.background)) {
         AmbientLight(lightTop)
-        if (result) ColorWash(analysis!!.ampel, lightTop)
+        if (result) ColorWash(analysis!!.ampel, lightTop, animate = state.revealPending)
         Pole(lightTop)
 
         Column(
@@ -128,7 +133,7 @@ fun HomeScreen(
                     AmpelMark()
                     Column {
                         Text("Briefampel", style = BriefType.brand, color = c.text, modifier = Modifier.semantics { heading() })
-                        Text(greeting(state.sender.name), style = BriefType.fine.copy(fontStyle = FontStyle.Italic, fontFamily = Serif, fontSize = BriefType.fine.fontSize * 1.1f), color = c.textMuted)
+                        Text(greeting(state.sender.name, Brief.now.hour), style = BriefType.fine.copy(fontStyle = FontStyle.Italic, fontFamily = Serif, fontSize = BriefType.fine.fontSize * 1.1f), color = c.textMuted)
                     }
                 }
                 CircleIconButton(BriefIcons.Person, "Absender und Einstellungen", onOpenSender)
@@ -174,8 +179,7 @@ fun HomeScreen(
     }
 }
 
-private fun greeting(name: String): String {
-    val hour = LocalDateTime.now().hour
+private fun greeting(name: String, hour: Int): String {
     val hello = when (hour) {
         in 5..10 -> "Guten Morgen"
         in 11..17 -> "Schön, dass du da bist"
@@ -226,11 +230,11 @@ private fun Pole(lightTop: Offset) {
 
 /** Der Schein der gezündeten Lampe färbt den Bildschirm ganz leicht ein. */
 @Composable
-private fun ColorWash(ampel: Ampel, lightTop: Offset) {
-    val reduced = Brief.reducedMotion
-    val alpha = remember(ampel) { Animatable(if (reduced) 0.75f else 0f) }
+private fun ColorWash(ampel: Ampel, lightTop: Offset, animate: Boolean) {
+    val still = Brief.reducedMotion || !animate
+    val alpha = remember(ampel) { Animatable(if (still) 0.75f else 0f) }
     LaunchedEffect(ampel) {
-        if (!reduced) {
+        if (alpha.value == 0f) {
             alpha.animateTo(1f, tween(560, delayMillis = 100, easing = Motion.Settle))
             alpha.animateTo(0.75f, tween(1040, easing = Motion.Settle))
         }
@@ -384,7 +388,7 @@ private fun blink(): Float {
 private fun ResultPeek(state: UiState, onOpenResult: () -> Unit, onDiscard: () -> Unit) {
     val c = Brief.colors
     val a = state.analysis ?: return
-    val today = Deadline.today()
+    val today = Brief.today
     val color = c.lamp(a.ampel)
     Column(
         Modifier

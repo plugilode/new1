@@ -62,7 +62,7 @@ private val checkedFormat = DateTimeFormatter.ofPattern("dd.MM. · HH:mm")
 fun ResultScreen(state: UiState, onBack: () -> Unit, onReply: () -> Unit, onToggleEnvelope: () -> Unit) {
     val c = Brief.colors
     val a = state.analysis ?: return
-    val today = Deadline.today()
+    val today = Brief.today
     val context = LocalContext.current
     val scroll = rememberScrollState()
     val glow = Lamp.glow(a.ampel)

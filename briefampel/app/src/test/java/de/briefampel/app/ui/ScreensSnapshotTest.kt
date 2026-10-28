@@ -18,6 +18,8 @@ import de.briefampel.app.ui.screen.UiState
 import de.briefampel.app.ui.theme.BriefampelTheme
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDateTime
 
 /** Rendert die Bildschirme als Screenshots (./gradlew recordPaparazziDebug), zur Design-Abnahme. */
@@ -25,13 +27,16 @@ class ScreensSnapshotTest {
     @get:Rule
     val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5, maxPercentDifference = 0.1)
 
-    private val today = Deadline.today()
+    // Fester Zeitpunkt: Mi 28.10.2026, 09:12 in Berlin – sonst ändern sich die Bilder jeden Tag.
+    private val clock = Clock.fixed(Instant.parse("2026-10-28T08:12:00Z"), Deadline.zone)
+    private val today = Deadline.today(clock)
+    private val now = LocalDateTime.now(clock)
     private val threePages = LetterInput(List(3) { LetterInput.Page("content://p$it", "image/jpeg") }, null)
-    private val base = UiState(input = threePages, receivedAt = LocalDateTime.now(), checkedAt = LocalDateTime.now())
+    private val base = UiState(input = threePages, receivedAt = now, checkedAt = now)
 
     private fun shot(dark: Boolean = false, content: @Composable () -> Unit) {
         paparazzi.unsafeUpdateConfig(deviceConfig = DeviceConfig.PIXEL_5.copy(nightMode = if (dark) NightMode.NIGHT else NightMode.NOTNIGHT))
-        paparazzi.snapshot { BriefampelTheme(dark = dark, reducedMotion = true, content = content) }
+        paparazzi.snapshot { BriefampelTheme(dark = dark, reducedMotion = true, clock = clock, content = content) }
     }
 
     @Composable
