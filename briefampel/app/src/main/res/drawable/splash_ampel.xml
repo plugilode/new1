@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector android:width="288dp" android:height="288dp"
+            android:viewportWidth="108" android:viewportHeight="108">
+            <path android:fillColor="#FFFCF7" android:strokeColor="#E2D5C3" android:strokeWidth="1"
+                android:pathData="M45,28h18a9,9 0,0 1,9 9v34a9,9 0,0 1,-9 9h-18a9,9 0,0 1,-9 -9v-34a9,9 0,0 1,9 -9z" />
+            <path android:fillColor="#F1D9CF" android:pathData="M54,40m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+            <path android:fillColor="#F3E3C6" android:pathData="M54,54m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+            <path android:fillColor="#D9E8DC" android:pathData="M54,68m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+            <path android:name="red" android:fillColor="#EC6A4C" android:fillAlpha="0" android:pathData="M54,40m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+            <path android:name="amber" android:fillColor="#F0AE45" android:fillAlpha="0" android:pathData="M54,54m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+            <path android:name="green" android:fillColor="#67B386" android:fillAlpha="0" android:pathData="M54,68m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+        </vector>
+    </aapt:attr>
+    <target android:name="red">
+        <aapt:attr name="android:animation">
+            <set android:ordering="sequentially">
+                <objectAnimator android:propertyName="fillAlpha" android:duration="180" android:valueFrom="0" android:valueTo="1" />
+                <objectAnimator android:propertyName="fillAlpha" android:duration="180" android:startOffset="80" android:valueFrom="1" android:valueTo="0" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="amber">
+        <aapt:attr name="android:animation">
+            <set android:ordering="sequentially">
+                <objectAnimator android:propertyName="fillAlpha" android:duration="180" android:startOffset="260" android:valueFrom="0" android:valueTo="1" />
+                <objectAnimator android:propertyName="fillAlpha" android:duration="180" android:startOffset="80" android:valueFrom="1" android:valueTo="0" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="green">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:duration="240" android:startOffset="520" android:valueFrom="0" android:valueTo="1" />
+        </aapt:attr>
+    </target>
+</animated-vector>
